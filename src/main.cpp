@@ -8,6 +8,7 @@
 #include <iostream>
 #include "init.hpp"
 #include "parseCommandLineOpts.hpp"
+#include "parser.hpp"
 #include "scanner.hpp"
 #include "TokenRecord.hpp"
 #include "token.hpp"
@@ -15,7 +16,6 @@
 
 int main(int argc, char **argv) {
     std::string fileNameToRead;
-    int lineCnt = 1;
 
     // Parse Command Line Options
     switch (parseCommandLineOpts(argc, argv)) {
@@ -38,15 +38,20 @@ int main(int argc, char **argv) {
     Scanner *scanner = initScanner(srcString);
 
 
+    // TODO: Below is where we should implement the usage of parser()
+
     /* ------------------------------------ */
-    // Test Scanner
+    // Test Parser
     /* ------------------------------------ */
-    while (1) {
-        TokenRecord *token = getNextToken(scanner, lineCnt);
-        printToken(token);
-        if (token->tokenId == EOF_tk)
-            break;
-    }
+
+    parser(scanner);
+
+//    while (1) {
+//        TokenRecord *token = getNextToken(scanner, lineCnt);
+//        printToken(token);
+//        if (token->tokenId == EOF_tk)
+//            break;
+//    }
 
     /* ------------------------------------ */
     // Free memory
