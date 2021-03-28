@@ -18,6 +18,7 @@ void R_nt(Scanner *scanner, TokenRecord *token, int &lineCount);
 void stats_nt(Scanner *scanner, TokenRecord *token, int &lineCount);
 void mStat_nt(Scanner *scanner, TokenRecord *token, int &lineCount);
 void stat_nt(Scanner *scanner, TokenRecord *token, int &lineCount);
+int isInFirstOfStat(tokenID id);
 void in_nt(Scanner *scanner, TokenRecord *token, int &lineCount);
 void out_nt(Scanner *scanner, TokenRecord *token, int &lineCount);
 void if_nt(Scanner *scanner, TokenRecord *token, int &lineCount);

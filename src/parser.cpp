@@ -146,6 +146,25 @@ void mStat_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
  *                      '<loop>': loop, '<assign>': assign, '<goto>': proc, '<label>': void }  */
 void stat_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
     // TODO
+int isInFirstOfStat(tokenID id) {
+    const tokenID statFirsts[] = {
+            GETTER_tk,
+            OUTTER_tk,
+            BEGIN_tk,
+            IF_tk,
+            LOOP_tk,
+            ASSIGN_tk,
+            PROC_tk,
+            VOID_tk
+    };
+    int len = sizeof(statFirsts) / sizeof(statFirsts[0]);
+    int i;
+
+    for(i = 0; i < len; i++) {
+        if (statFirsts[i] == id) return 1;
+    }
+
+    return 0;
 }
 
 /* TODO * * * * * * * * * * * * * * * * * * * * * * * * * * */
