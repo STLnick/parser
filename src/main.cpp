@@ -37,21 +37,11 @@ int main(int argc, char **argv) {
     // Initialize the Scanner
     Scanner *scanner = initScanner(srcString);
 
-
-    // TODO: Below is where we should implement the usage of parser()
-
     /* ------------------------------------ */
     // Test Parser
     /* ------------------------------------ */
 
     parser(scanner);
-
-//    while (1) {
-//        TokenRecord *token = getNextToken(scanner, lineCnt);
-//        printToken(token);
-//        if (token->tokenId == EOF_tk)
-//            break;
-//    }
 
     /* ------------------------------------ */
     // Free memory
