@@ -22,3 +22,51 @@ void parser(Scanner *scanner) {
 
     return;
 }
+void expr_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
+    // TODO
+}
+void N_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
+    // TODO
+}
+void A_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
+    // TODO
+}
+void M_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
+    // TODO
+}
+void R_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
+    // TODO
+}
+void stats_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
+    // TODO
+}
+void mStat_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
+    // TODO
+}
+void stat_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
+    // TODO
+}
+void in_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
+    // TODO
+}
+void out_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
+    // TODO
+}
+void if_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
+    // TODO
+}
+void loop_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
+    // TODO
+}
+void assign_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
+    // TODO
+}
+void RO_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
+    // TODO
+}
+void label_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
+    // TODO
+}
+void goto_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
+    // TODO
+}
