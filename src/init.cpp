@@ -8,7 +8,7 @@
 void init(int argc, char **argv, std::string &fileNameToRead) {
     std::string buffer;
     // Read in input if needed and set the filename to be read depending on arguments
-    /*  ./scanner or ./scanner < filename  */
+    /*  ./frontEnd or ./frontEnd < filename  */
     if (argc == 1) {
         std::ofstream tempFile;
         // Open temp file to hold user input or redirected file input
@@ -37,7 +37,7 @@ void init(int argc, char **argv, std::string &fileNameToRead) {
         tempFile.close();
 
         fileNameToRead = "output";
-        /*  ./scanner filename  */
+        /*  ./frontEnd filename  */
     } else if (argc == 2) {
         fileNameToRead = argv[1];
         int dotIndex = fileNameToRead.find('.');
