@@ -6,8 +6,10 @@
 #define PARSER_PARSER_HPP
 #include "scanner.hpp"
 
-void program_nt(Scanner *scanner, int &lineCount);
 void parser(Scanner *scanner);
+void program_nt(Scanner *scanner, TokenRecord *token, int &lineCount);
+void block_nt(Scanner *scanner, TokenRecord *token, int &lineCount);
+void vars_nt(Scanner *scanner, TokenRecord *token, int &lineCount);
 void expr_nt(Scanner *scanner, TokenRecord *token, int &lineCount);
 void N_nt(Scanner *scanner, TokenRecord *token, int &lineCount);
 void A_nt(Scanner *scanner, TokenRecord *token, int &lineCount);
