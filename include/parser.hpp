@@ -6,7 +6,7 @@
 #define PARSER_PARSER_HPP
 #include "scanner.hpp"
 
-void S();
+void program_nt(Scanner *scanner, int &lineCount);
 void parser(Scanner *scanner);
 
 #endif //PARSER_PARSER_HPP
