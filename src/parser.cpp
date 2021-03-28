@@ -18,6 +18,7 @@ void parser(Scanner *scanner) {
     return;
 }
 
+/*  <program> -> <vars> main <block>  */
 void program_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
     std::cout << "program_nt() : <vars>" << std::endl; // TODO: _nt function
     vars_nt(scanner, token, lineCount);
@@ -33,6 +34,7 @@ void program_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
     block_nt(scanner, token, lineCount);
 }
 
+/*  <block> -> begin <vars> <stats> end  */
 void block_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
     if (token->tokenId == BEGIN_tk) { // [Predict] begin <vars> <stats> end
         token = getNextToken(scanner, lineCount);
@@ -54,6 +56,7 @@ void block_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
     }
 }
 
+/*  <vars> -> ε | data Identifier := Integer ; <vars>  */
 void vars_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
     if (token->tokenId == DATA_tk) { // [Predict] data Identifier := Integer ; <vars>
         token = getNextToken(scanner, lineCount); // consume DATA_tk token
@@ -76,6 +79,27 @@ void vars_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
     }
 }
 
+/*  <expr> -> <N> - <expr> | <N>  */
+void expr_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
+    // TODO
+}
+
+/*  <N> -> <A> / <N> | <A> * <N> | <A>  */
+void N_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
+    // TODO
+}
+
+/*  <A> -> <M> + <A> | <M>  */
+void A_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
+    // TODO
+}
+
+/*  <M> -> * <M> | <R>  */
+void M_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
+    // TODO
+}
+
+/*  <R> -> ( <expr> ) | Identifier | Integer  */
 void expr_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
     // TODO
 }
@@ -91,36 +115,54 @@ void M_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
 void R_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
     // TODO
 }
+/*  <stats> -> <stat> <mStat>  */
 void stats_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
     // TODO
 }
+/*  <mStat> -> ε | <stat> <mStat>  */
 void mStat_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
     // TODO
 }
+/*  <stat> -> <in> ; | <out> ; | <block> | <if> ; | <loop> ; | <assign> ; | <goto> ; | <label> ; |  */
 void stat_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
     // TODO
 }
+/*  <in> -> getter Identifier  */
 void in_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
     // TODO
 }
+
+/*  <out> -> outter <expr>  */
 void out_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
     // TODO
 }
+
+/*  <if> -> if [ <expr> <RO> <expr> ] then <stat> */
 void if_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
     // TODO
 }
+
+/*  <loop> -> loop [ <expr> <RO> <expr> ] then <stat>  */
 void loop_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
     // TODO
 }
+
+/*  <assign> -> assign Identifier := <expr>  */
 void assign_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
     // TODO
 }
+
+/*  <RO> -> => | =< | == | [ == ] (three tokens) | %  */
 void RO_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
     // TODO
 }
+
+/*  <label> -> void Identifier  */
 void label_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
     // TODO
 }
+
+/*  <goto> -> proc Identifier  */
 void goto_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
     // TODO
 }
