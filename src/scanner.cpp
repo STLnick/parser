@@ -111,9 +111,14 @@ TokenRecord *getNextToken(Scanner *scanner, int &lineCnt) {
     std::string str;
     int transition;
 
+    std::cout << "\t::getNextToken 1 - - - -" << std::endl;
+
     while (state != FINAL) {
+        std::cout << "\t::getNextToken 2 state: " << state << std::endl;
         transition = getTransitionFromChar(scanner->c);
+        std::cout << "\t::getNextToken 3 - transition: " << transition << std::endl;
         nextState = Table[state][transition];
+        std::cout << "\t::getNextToken 4 - nextState: " << nextState << std::endl;
         if(scanner->c == '\n' && state == INITIAL) {
             lineCnt++;
         }
@@ -125,18 +130,25 @@ TokenRecord *getNextToken(Scanner *scanner, int &lineCnt) {
             exit(1);
         }
 
+        std::cout << "\t::getNextToken 5" << std::endl;
+
         if (nextState == FINAL) {
+            std::cout << "\t::getNextToken 6 - nextState == FINAL" << std::endl;
             return getTypedToken(state, str, lineCnt);
         } else if (nextState == EOF_) {
+            std::cout << "\t::getNextToken 6 - nextState == EOF_" << std::endl;
             return initToken("\0", EOF_tk, lineCnt);
         } else if (nextState == CMT_ST_A) {
+            std::cout << "\t::getNextToken 6 - nextState == CMT_ST_A" << std::endl;
             tempState = state; // save the current state when comment started
             state = nextState;
             advanceScanner(scanner);
         } else if (nextState == CMT_ST_B || nextState == CMT_END_A || nextState == CMT_END_B) {
+            std::cout << "\t::getNextToken 6 - nextState == CMT_ST_B || CMT_END_A / B" << std::endl;
             state = nextState == CMT_END_B ? tempState : nextState;
             advanceScanner(scanner);
         } else {
+            std::cout << "\t::getNextToken 6 - else..." << std::endl;
             state = nextState;
             if (!isspace(scanner->c)) {
                 str += scanner->c;

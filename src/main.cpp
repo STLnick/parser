@@ -33,6 +33,7 @@ int main(int argc, char **argv) {
     std::ifstream srcFile(fileNameToRead + ".fs");
     std::string srcString;
     readSrcIntoString(srcFile, srcString);
+    std::cout << "srcString: \n" << srcString << std::endl;
 
     // Initialize the Scanner
     Scanner *scanner = initScanner(srcString);
@@ -42,6 +43,8 @@ int main(int argc, char **argv) {
     /* ------------------------------------ */
 
     parser(scanner);
+
+    std::cout << "\t::Post-parser()" << std::endl;
 
     /* ------------------------------------ */
     // Free memory

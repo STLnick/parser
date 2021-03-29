@@ -18,7 +18,6 @@ void R_nt(Scanner *scanner, TokenRecord *token, int &lineCount);
 void stats_nt(Scanner *scanner, TokenRecord *token, int &lineCount);
 void mStat_nt(Scanner *scanner, TokenRecord *token, int &lineCount);
 void stat_nt(Scanner *scanner, TokenRecord *token, int &lineCount);
-int isInFirstOfStat(tokenID id);
 void in_nt(Scanner *scanner, TokenRecord *token, int &lineCount);
 void out_nt(Scanner *scanner, TokenRecord *token, int &lineCount);
 void if_nt(Scanner *scanner, TokenRecord *token, int &lineCount);
@@ -27,5 +26,7 @@ void assign_nt(Scanner *scanner, TokenRecord *token, int &lineCount);
 void RO_nt(Scanner *scanner, TokenRecord *token, int &lineCount);
 void label_nt(Scanner *scanner, TokenRecord *token, int &lineCount);
 void goto_nt(Scanner *scanner, TokenRecord *token, int &lineCount);
+int isInFirstOfStat(tokenID id);
+void printErrorAndExit(std::string expected, tokenID received);
 
 #endif //PARSER_PARSER_HPP
