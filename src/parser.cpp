@@ -25,11 +25,7 @@ void parser(Scanner *scanner) {
 void program_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
     vars_nt(scanner, token, lineCount);
 
-    if (token->tokenId == MAIN_tk) {
-        token = getNextToken(scanner, lineCount);
-    } else {
-        printErrorAndExit("main", token->tokenId, token->lineNum);
-    }
+    checkAndConsumeTerminal(scanner, token, lineCount, MAIN_tk);
 
     block_nt(scanner, token, lineCount);
 
@@ -40,16 +36,12 @@ void program_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
 /*  first( <block> ) : { begin }  */
 void block_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
     if (token->tokenId == BEGIN_tk) { // [Predict] begin <vars> <stats> end
-        token = getNextToken(scanner, lineCount);
+        token = getNextToken(scanner, lineCount); // consume BEGIN_tk
 
         vars_nt(scanner, token, lineCount);
         stats_nt(scanner, token, lineCount);
 
-        if (token->tokenId == END_tk) {
-            token = getNextToken(scanner, lineCount);
-        } else {
-            printErrorAndExit("end", token->tokenId, token->lineNum);
-        }
+        checkAndConsumeTerminal(scanner, token, lineCount, END_tk);
 
         return; // explicit return
     } else {
@@ -63,29 +55,13 @@ void vars_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
     if (token->tokenId == DATA_tk) { // [Predict] data Identifier := Integer ; <vars>
         token = getNextToken(scanner, lineCount); // consume DATA_tk token
 
-        if (token->tokenId == ID_tk) {
-            token = getNextToken(scanner, lineCount); // Identifier
-        } else {
-            printErrorAndExit("Identifier", token->tokenId, token->lineNum);
-        }
+        checkAndConsumeTerminal(scanner, token, lineCount, ID_tk);
 
-        if (token->tokenId == COLONEQ_tk) {
-            token = getNextToken(scanner, lineCount); // :=
-        } else {
-            printErrorAndExit(":=", token->tokenId, token->lineNum);
-        }
+        checkAndConsumeTerminal(scanner, token, lineCount, COLONEQ_tk);
 
-        if (token->tokenId == NUM_tk) {
-            token = getNextToken(scanner, lineCount); // Number
-        } else {
-            printErrorAndExit("Number", token->tokenId, token->lineNum);
-        }
+        checkAndConsumeTerminal(scanner, token, lineCount, NUM_tk);
 
-        if (token->tokenId == SEMI_tk) {
-            token = getNextToken(scanner, lineCount); // Semicolon
-        } else {
-            printErrorAndExit(";", token->tokenId, token->lineNum);
-        }
+        checkAndConsumeTerminal(scanner, token, lineCount, SEMI_tk);
 
         vars_nt(scanner, token, lineCount); // vars_nt()
 
@@ -154,55 +130,27 @@ void mStat_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
 void stat_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
     if (token->tokenId == GETTER_tk) {
         in_nt(scanner, token, lineCount);
-        if (token->tokenId == SEMI_tk) {
-            token = getNextToken(scanner, lineCount);
-        } else {
-            printErrorAndExit(";", token->tokenId, token->lineNum);
-        }
+        checkAndConsumeTerminal(scanner, token, lineCount, SEMI_tk);
     } else if (token->tokenId == OUTTER_tk) {
         out_nt(scanner, token, lineCount);
-        if (token->tokenId == SEMI_tk) {
-            token = getNextToken(scanner, lineCount);
-        } else {
-            printErrorAndExit("outter", token->tokenId, token->lineNum);
-        }
+        checkAndConsumeTerminal(scanner, token, lineCount, SEMI_tk);
     } else if (token->tokenId == BEGIN_tk) {
         block_nt(scanner, token, lineCount);
     } else if (token->tokenId == IF_tk) {
         if_nt(scanner, token, lineCount);
-        if (token->tokenId == SEMI_tk) {
-            token = getNextToken(scanner, lineCount);
-        } else {
-            printErrorAndExit("begin", token->tokenId, token->lineNum);
-        }
+        checkAndConsumeTerminal(scanner, token, lineCount, SEMI_tk);
     } else if (token->tokenId == LOOP_tk) {
         loop_nt(scanner, token, lineCount);
-        if (token->tokenId == SEMI_tk) {
-            token = getNextToken(scanner, lineCount);
-        } else {
-            printErrorAndExit("loop", token->tokenId, token->lineNum);
-        }
+        checkAndConsumeTerminal(scanner, token, lineCount, SEMI_tk);
     } else if (token->tokenId == ASSIGN_tk) {
         assign_nt(scanner, token, lineCount);
-        if (token->tokenId == SEMI_tk) {
-            token = getNextToken(scanner, lineCount);
-        } else {
-            printErrorAndExit("assign", token->tokenId, token->lineNum);
-        }
+        checkAndConsumeTerminal(scanner, token, lineCount, SEMI_tk);
     } else if (token->tokenId == PROC_tk) {
         goto_nt(scanner, token, lineCount);
-        if (token->tokenId == SEMI_tk) {
-            token = getNextToken(scanner, lineCount);
-        } else {
-            printErrorAndExit("proc", token->tokenId, token->lineNum);
-        }
+        checkAndConsumeTerminal(scanner, token, lineCount, SEMI_tk);
     } else if (token->tokenId == VOID_tk) {
         label_nt(scanner, token, lineCount);
-        if (token->tokenId == SEMI_tk) {
-            token = getNextToken(scanner, lineCount);
-        } else {
-            printErrorAndExit("void", token->tokenId, token->lineNum);
-        }
+        checkAndConsumeTerminal(scanner, token, lineCount, SEMI_tk);
     } else {
         printErrorAndExit("getter/outter/begin/if/loop/assign/proc/void", token->tokenId, token->lineNum);
     }
@@ -213,17 +161,9 @@ void stat_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
 /*  <in> -> getter Identifier  */
 /*  first( <in> ) : { getter }  */
 void in_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
-    if (token->tokenId == GETTER_tk) {
-        token = getNextToken(scanner, lineCount);
-    } else {
-        printErrorAndExit("getter", token->tokenId, token->lineNum);
-    }
+    checkAndConsumeTerminal(scanner, token, lineCount, GETTER_tk);
 
-    if (token->tokenId == ID_tk) {
-        token = getNextToken(scanner, lineCount);
-    } else {
-        printErrorAndExit("Identifier", token->tokenId, token->lineNum);
-    }
+    checkAndConsumeTerminal(scanner, token, lineCount, ID_tk);
 
     return; // explicit return
 }
