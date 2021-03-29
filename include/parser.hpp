@@ -28,6 +28,6 @@ void label_nt(Scanner *scanner, TokenRecord *&token, int &lineCount);
 void goto_nt(Scanner *scanner, TokenRecord *&token, int &lineCount);
 void checkAndConsumeTerminal(Scanner *scanner, TokenRecord *&token, int &lineCount, tokenID targetId);
 int isInFirstOfStat(tokenID id);
-void printErrorAndExit(std::string expected, tokenID received);
+void printErrorAndExit(std::string expected, tokenID received, int line);
 
 #endif //PARSER_PARSER_HPP

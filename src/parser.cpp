@@ -14,7 +14,7 @@ void parser(Scanner *scanner) {
     program_nt(scanner, token, lineCount); // Grandpappy non-terminal processing
 
     if (token->tokenId != EOF_tk) {
-        printErrorAndExit("End of File", token->tokenId);
+        printErrorAndExit("End of File", token->tokenId, token->lineNum);
     }
 
     return;
@@ -28,7 +28,7 @@ void program_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
     if (token->tokenId == MAIN_tk) {
         token = getNextToken(scanner, lineCount);
     } else {
-        printErrorAndExit("main", token->tokenId);
+        printErrorAndExit("main", token->tokenId, token->lineNum);
     }
 
     block_nt(scanner, token, lineCount);
@@ -48,12 +48,12 @@ void block_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
         if (token->tokenId == END_tk) {
             token = getNextToken(scanner, lineCount);
         } else {
-            printErrorAndExit("end", token->tokenId);
+            printErrorAndExit("end", token->tokenId, token->lineNum);
         }
 
         return; // explicit return
     } else {
-        printErrorAndExit("begin", token->tokenId);
+        printErrorAndExit("begin", token->tokenId, token->lineNum);
     }
 }
 
@@ -66,25 +66,25 @@ void vars_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
         if (token->tokenId == ID_tk) {
             token = getNextToken(scanner, lineCount); // Identifier
         } else {
-            printErrorAndExit("Identifier", token->tokenId);
+            printErrorAndExit("Identifier", token->tokenId, token->lineNum);
         }
 
         if (token->tokenId == COLONEQ_tk) {
             token = getNextToken(scanner, lineCount); // :=
         } else {
-            printErrorAndExit(":=", token->tokenId);
+            printErrorAndExit(":=", token->tokenId, token->lineNum);
         }
 
         if (token->tokenId == NUM_tk) {
             token = getNextToken(scanner, lineCount); // Number
         } else {
-            printErrorAndExit("Number", token->tokenId);
+            printErrorAndExit("Number", token->tokenId, token->lineNum);
         }
 
         if (token->tokenId == SEMI_tk) {
             token = getNextToken(scanner, lineCount); // Semicolon
         } else {
-            printErrorAndExit(";", token->tokenId);
+            printErrorAndExit(";", token->tokenId, token->lineNum);
         }
 
         vars_nt(scanner, token, lineCount); // vars_nt()
@@ -157,14 +157,14 @@ void stat_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
         if (token->tokenId == SEMI_tk) {
             token = getNextToken(scanner, lineCount);
         } else {
-            printErrorAndExit(";", token->tokenId);
+            printErrorAndExit(";", token->tokenId, token->lineNum);
         }
     } else if (token->tokenId == OUTTER_tk) {
         out_nt(scanner, token, lineCount);
         if (token->tokenId == SEMI_tk) {
             token = getNextToken(scanner, lineCount);
         } else {
-            printErrorAndExit("outter", token->tokenId);
+            printErrorAndExit("outter", token->tokenId, token->lineNum);
         }
     } else if (token->tokenId == BEGIN_tk) {
         block_nt(scanner, token, lineCount);
@@ -173,38 +173,38 @@ void stat_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
         if (token->tokenId == SEMI_tk) {
             token = getNextToken(scanner, lineCount);
         } else {
-            printErrorAndExit("begin", token->tokenId);
+            printErrorAndExit("begin", token->tokenId, token->lineNum);
         }
     } else if (token->tokenId == LOOP_tk) {
         loop_nt(scanner, token, lineCount);
         if (token->tokenId == SEMI_tk) {
             token = getNextToken(scanner, lineCount);
         } else {
-            printErrorAndExit("loop", token->tokenId);
+            printErrorAndExit("loop", token->tokenId, token->lineNum);
         }
     } else if (token->tokenId == ASSIGN_tk) {
         assign_nt(scanner, token, lineCount);
         if (token->tokenId == SEMI_tk) {
             token = getNextToken(scanner, lineCount);
         } else {
-            printErrorAndExit("assign", token->tokenId);
+            printErrorAndExit("assign", token->tokenId, token->lineNum);
         }
     } else if (token->tokenId == PROC_tk) {
         goto_nt(scanner, token, lineCount);
         if (token->tokenId == SEMI_tk) {
             token = getNextToken(scanner, lineCount);
         } else {
-            printErrorAndExit("proc", token->tokenId);
+            printErrorAndExit("proc", token->tokenId, token->lineNum);
         }
     } else if (token->tokenId == VOID_tk) {
         label_nt(scanner, token, lineCount);
         if (token->tokenId == SEMI_tk) {
             token = getNextToken(scanner, lineCount);
         } else {
-            printErrorAndExit("void", token->tokenId);
+            printErrorAndExit("void", token->tokenId, token->lineNum);
         }
     } else {
-        printErrorAndExit("getter/outter/begin/if/loop/assign/proc/void", token->tokenId);
+        printErrorAndExit("getter/outter/begin/if/loop/assign/proc/void", token->tokenId, token->lineNum);
     }
 
     return; // explicit return
@@ -216,13 +216,13 @@ void in_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
     if (token->tokenId == GETTER_tk) {
         token = getNextToken(scanner, lineCount);
     } else {
-        printErrorAndExit("getter", token->tokenId);
+        printErrorAndExit("getter", token->tokenId, token->lineNum);
     }
 
     if (token->tokenId == ID_tk) {
         token = getNextToken(scanner, lineCount);
     } else {
-        printErrorAndExit("Identifier", token->tokenId);
+        printErrorAndExit("Identifier", token->tokenId, token->lineNum);
     }
 
     return; // explicit return
@@ -281,7 +281,7 @@ void checkAndConsumeTerminal(Scanner *scanner, TokenRecord *&token, int &lineCou
     if (token->tokenId == targetId) {
         token = getNextToken(scanner, lineCount);
     } else {
-        printErrorAndExit(tokenNames[targetId], token->tokenId);
+        printErrorAndExit(tokenNames[targetId], token->tokenId, token->lineNum);
     }
 }
 
@@ -306,7 +306,8 @@ int isInFirstOfStat(tokenID id) {
     return 0;
 }
 
-void printErrorAndExit(std::string expected, tokenID received) {
-    std::cout << "ERROR: Expected '" << expected << "' but got '" << tokenNames[received] << "' instead." << std::endl;
+void printErrorAndExit(std::string expected, tokenID received, int line) {
+    std::cout   << "ERROR: Expected '" << expected << "' on line " << line
+                << " but received '" << tokenLiterals[received] << "' instead." << std::endl;
     exit(1);
 }

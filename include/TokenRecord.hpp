@@ -14,7 +14,8 @@
 /* Double char tokens */
 // == => := =<
 
-// TODO: Make these TokenTypes the actual needed types
+// TODO: create a map to the first() of a token for error output
+
 enum tokenID {
     ID_tk,
     NUM_tk,
@@ -92,6 +93,45 @@ const std::string tokenNames[] = {
         "Assign Keyword",
         "Data Keyword",
         "Proc Keyword"
+};
+const std::string tokenLiterals[] = {
+        "Identifier",
+        "Number",
+        "End Of File",
+        "Assignment Operator",
+        ";",
+        "+",
+        "-",
+        "*",
+        "/",
+        "%",
+        ".",
+        ",",
+        ":",
+        "(",
+        ")",
+        "{",
+        "}",
+        "[",
+        "]",
+        "==",
+        "=>",
+        "=<",
+        ":=",
+        "begin",
+        "end",
+        "loop",
+        "whole",
+        "void",
+        "exit",
+        "getter",
+        "outter",
+        "main",
+        "if",
+        "then",
+        "assign",
+        "data",
+        "proc"
 };
 const std::string keywords[] = {
         "begin",
