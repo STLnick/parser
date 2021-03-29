@@ -9,15 +9,9 @@
 void parser(Scanner *scanner) {
     int lineCount = 1;
 
-    std::cout << "\t::parser 0" << std::endl;
-
     TokenRecord *token = getNextToken(scanner, lineCount);
 
-    std::cout << "\t::parser 1" << std::endl;
-
     program_nt(scanner, token, lineCount); // Grandpappy non-terminal processing
-
-    std::cout << "\t::parser 2" << std::endl;
 
     if (token->tokenId != EOF_tk) {
         printErrorAndExit("End of File", token->tokenId);
@@ -28,18 +22,15 @@ void parser(Scanner *scanner) {
 
 /*  <program> -> <vars> main <block>  */
 /*  first( <program> ) : { data, main }  */
-void program_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
-    std::cout << "program_nt() : <vars>" << std::endl; // TODO: _nt function
+void program_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
     vars_nt(scanner, token, lineCount);
 
     if (token->tokenId == MAIN_tk) {
         token = getNextToken(scanner, lineCount);
-        std::cout << "program_nt() : main " << std::endl;
     } else {
         printErrorAndExit("main", token->tokenId);
     }
 
-    std::cout << "program_nt() : <block>" << std::endl; // TODO: _nt function
     block_nt(scanner, token, lineCount);
 
     return; // explicit return
@@ -47,18 +38,15 @@ void program_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
 
 /*  <block> -> begin <vars> <stats> end  */
 /*  first( <block> ) : { begin }  */
-void block_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
+void block_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
     if (token->tokenId == BEGIN_tk) { // [Predict] begin <vars> <stats> end
         token = getNextToken(scanner, lineCount);
-        std::cout << "block_nt() : begin" << std::endl;
 
         vars_nt(scanner, token, lineCount);
-
         stats_nt(scanner, token, lineCount);
 
         if (token->tokenId == END_tk) {
             token = getNextToken(scanner, lineCount);
-            std::cout << "block_nt() : end" << std::endl;
         } else {
             printErrorAndExit("end", token->tokenId);
         }
@@ -71,7 +59,7 @@ void block_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
 
 /*  <vars> -> ε | data Identifier := Integer ; <vars>  */
 /*  first( <vars> ) : { data }  */
-void vars_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
+void vars_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
     if (token->tokenId == DATA_tk) { // [Predict] data Identifier := Integer ; <vars>
         token = getNextToken(scanner, lineCount); // consume DATA_tk token
 
@@ -110,49 +98,47 @@ void vars_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
 /*  <expr> -> <N> - <expr> | <N>  */
 /*  first( <expr> ) : { first(N) }  */
 // process <N> - then check for '-' to choose production
-void expr_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
+void expr_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
     // TODO
 }
 
 /*  <N> -> <A> / <N> | <A> * <N> | <A>  */
 /*  first( <N> ) : { first(A) }  */
 // process <A> - then check for '/', '*', or nothing to choose production
-void N_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
+void N_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
     // TODO
 }
 
 /*  <A> -> <M> + <A> | <M>  */
 /*  first( <A> ) : { '* <M>': *, '<R>': [ '(', Identifier, Integer/Number ] }  */
 // process <M> if PLUS_tk process <M> + <A> else just process <M> and return
-void A_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
+void A_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
     // TODO
 }
 
 /*  <M> -> * <M> | <R>  */
 /*  first( <M> ) : { '* <M>': *, '<R>': [ '(', Identifier, Integer/Number ] }  */
-void M_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
+void M_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
     // TODO
 }
 
 /*  <R> -> ( <expr> ) | Identifier | Integer  */
 /*  first( <R> ) : { '( <expr> )': '(', 'Identifier': Identifier, 'Integer': Integer/Number }  */
-void R_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
+void R_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
     // TODO
 }
 
 /*  <stats> -> <stat> <mStat>  */
 /*  first( <stats> ) : { '<stat> <mStat>': [getter, outter, begin, if, loop, assign, proc, void] }  */
-void stats_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
+void stats_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
     stat_nt(scanner, token, lineCount);
-
     mStat_nt(scanner, token, lineCount);
-
     return; // explicit return
 }
 
 /*  <mStat> -> ε | <stat> <mStat>  */
 /*  first( <mStat> ) : { '<stat> <mStat>': [getter, outter, begin, if, loop, assign, proc, void] }  */
-void mStat_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
+void mStat_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
     if ( isInFirstOfStat(token->tokenId) ) { // [Predict] <stat> <mStat>
         stat_nt(scanner, token, lineCount);
         mStat_nt(scanner, token, lineCount);
@@ -165,69 +151,60 @@ void mStat_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
 /*  <stat> -> <in> ; | <out> ; | <block> | <if> ; | <loop> ; | <assign> ; | <goto> ; | <label> ; |  */
 /*  first( <stat> ) : { '<in>': getter, '<out>': outter, '<block>': begin, '<if>': if,
  *                      '<loop>': loop, '<assign>': assign, '<goto>': proc, '<label>': void }  */
-void stat_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
-    switch(token->tokenId) {
-        case GETTER_tk:
-            in_nt(scanner, token, lineCount);
-            if (token->tokenId == SEMI_tk) {
-                token = getNextToken(scanner, lineCount);
-            } else {
-                printErrorAndExit(";", token->tokenId);
-            }
-            break;
-        case OUTTER_tk:
-            out_nt(scanner, token, lineCount);
-            if (token->tokenId == SEMI_tk) {
-                token = getNextToken(scanner, lineCount);
-            } else {
-                printErrorAndExit(";", token->tokenId);
-            }
-            break;
-        case BEGIN_tk:
-            block_nt(scanner, token, lineCount);
-            break;
-        case IF_tk:
-            if_nt(scanner, token, lineCount);
-            if (token->tokenId == SEMI_tk) {
-                token = getNextToken(scanner, lineCount);
-            } else {
-                printErrorAndExit(";", token->tokenId);
-            }
-            break;
-        case LOOP_tk:
-            loop_nt(scanner, token, lineCount);
-            if (token->tokenId == SEMI_tk) {
-                token = getNextToken(scanner, lineCount);
-            } else {
-                printErrorAndExit(";", token->tokenId);
-            }
-            break;
-        case ASSIGN_tk:
-            assign_nt(scanner, token, lineCount);
-            if (token->tokenId == SEMI_tk) {
-                token = getNextToken(scanner, lineCount);
-            } else {
-                printErrorAndExit(";", token->tokenId);
-            }
-            break;
-        case PROC_tk:
-            goto_nt(scanner, token, lineCount);
-            if (token->tokenId == SEMI_tk) {
-                token = getNextToken(scanner, lineCount);
-            } else {
-                printErrorAndExit(";", token->tokenId);
-            }
-            break;
-        case VOID_tk:
-            label_nt(scanner, token, lineCount);
-            if (token->tokenId == SEMI_tk) {
-                token = getNextToken(scanner, lineCount);
-            } else {
-                printErrorAndExit(";", token->tokenId);
-            }
-            break;
-        default:
-            printErrorAndExit("getter/outter/begin/if/loop/assign/proc/void", token->tokenId);
+void stat_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
+    if (token->tokenId == GETTER_tk) {
+        in_nt(scanner, token, lineCount);
+        if (token->tokenId == SEMI_tk) {
+            token = getNextToken(scanner, lineCount);
+        } else {
+            printErrorAndExit(";", token->tokenId);
+        }
+    } else if (token->tokenId == OUTTER_tk) {
+        out_nt(scanner, token, lineCount);
+        if (token->tokenId == SEMI_tk) {
+            token = getNextToken(scanner, lineCount);
+        } else {
+            printErrorAndExit("outter", token->tokenId);
+        }
+    } else if (token->tokenId == BEGIN_tk) {
+        block_nt(scanner, token, lineCount);
+    } else if (token->tokenId == IF_tk) {
+        if_nt(scanner, token, lineCount);
+        if (token->tokenId == SEMI_tk) {
+            token = getNextToken(scanner, lineCount);
+        } else {
+            printErrorAndExit("begin", token->tokenId);
+        }
+    } else if (token->tokenId == LOOP_tk) {
+        loop_nt(scanner, token, lineCount);
+        if (token->tokenId == SEMI_tk) {
+            token = getNextToken(scanner, lineCount);
+        } else {
+            printErrorAndExit("loop", token->tokenId);
+        }
+    } else if (token->tokenId == ASSIGN_tk) {
+        assign_nt(scanner, token, lineCount);
+        if (token->tokenId == SEMI_tk) {
+            token = getNextToken(scanner, lineCount);
+        } else {
+            printErrorAndExit("assign", token->tokenId);
+        }
+    } else if (token->tokenId == PROC_tk) {
+        goto_nt(scanner, token, lineCount);
+        if (token->tokenId == SEMI_tk) {
+            token = getNextToken(scanner, lineCount);
+        } else {
+            printErrorAndExit("proc", token->tokenId);
+        }
+    } else if (token->tokenId == VOID_tk) {
+        label_nt(scanner, token, lineCount);
+        if (token->tokenId == SEMI_tk) {
+            token = getNextToken(scanner, lineCount);
+        } else {
+            printErrorAndExit("void", token->tokenId);
+        }
+    } else {
+        printErrorAndExit("getter/outter/begin/if/loop/assign/proc/void", token->tokenId);
     }
 
     return; // explicit return
@@ -235,7 +212,7 @@ void stat_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
 
 /*  <in> -> getter Identifier  */
 /*  first( <in> ) : { getter }  */
-void in_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
+void in_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
     if (token->tokenId == GETTER_tk) {
         token = getNextToken(scanner, lineCount);
     } else {
@@ -253,51 +230,59 @@ void in_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
 
 /*  <out> -> outter <expr>  */
 /*  first( <out> ) : { outter }  */
-void out_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
+void out_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
     // TODO
     return; // explicit return
 }
 
 /*  <if> -> if [ <expr> <RO> <expr> ] then <stat> */
 /*  first( <if> ) : { if }  */
-void if_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
+void if_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
     // TODO
     return; // explicit return
 }
 
 /*  <loop> -> loop [ <expr> <RO> <expr> ] then <stat>  */
 /*  first( <loop> ) : { loop }  */
-void loop_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
+void loop_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
     // TODO
     return; // explicit return
 }
 
 /*  <assign> -> assign Identifier := <expr>  */
 /*  first( <assign> ) : { assign }  */
-void assign_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
+void assign_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
     // TODO
     return; // explicit return
 }
 
 /*  <RO> -> => | =< | == | [ == ] (three tokens) | %  */
 /*  first( <R0> ) : { =, %, [ }  */
-void RO_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
+void RO_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
     // TODO: process the first '=' for all two char tokens
     return; // explicit return
 }
 
 /*  <label> -> void Identifier  */
 /*  first( <label> ) : { void }  */
-void label_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
+void label_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
     // TODO
     return; // explicit return
 }
 
 /*  <goto> -> proc Identifier  */
 /*  first( <goto> ) : { proc }  */
-void goto_nt(Scanner *scanner, TokenRecord *token, int &lineCount) {
+void goto_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
     // TODO
     return; // explicit return
+}
+
+void checkAndConsumeTerminal(Scanner *scanner, TokenRecord *&token, int &lineCount, tokenID targetId) {
+    if (token->tokenId == targetId) {
+        token = getNextToken(scanner, lineCount);
+    } else {
+        printErrorAndExit(tokenNames[targetId], token->tokenId);
+    }
 }
 
 int isInFirstOfStat(tokenID id) {

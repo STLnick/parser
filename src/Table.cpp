@@ -2,11 +2,8 @@
 // Created by Nick Ray on 3/7/21.
 //
 #include <ctype.h>
-#include "State.hpp"
-#include <iostream>
 
 int getTransitionFromChar(char c) {
-    std::cout << "getTransitionFromChar - c: " << c << std::endl;
     if (isalpha(c)) return 0; // Letter
     if (isdigit(c)) return 1; // Digit
     if (isspace(c)) return 2; // Whitespace
