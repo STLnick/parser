@@ -27,6 +27,7 @@ void RO_nt(Scanner *scanner, TokenRecord *&token, int &lineCount);
 void label_nt(Scanner *scanner, TokenRecord *&token, int &lineCount);
 void goto_nt(Scanner *scanner, TokenRecord *&token, int &lineCount);
 void checkAndConsumeTerminal(Scanner *scanner, TokenRecord *&token, int &lineCount, tokenID targetId);
+int isInFirstOfR(tokenID id);
 int isInFirstOfStat(tokenID id);
 void printErrorAndExit(std::string expected, tokenID received, int line);
 

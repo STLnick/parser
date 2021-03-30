@@ -75,33 +75,83 @@ void vars_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
 /*  first( <expr> ) : { first(N) }  */
 // process <N> - then check for '-' to choose production
 void expr_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
-    // TODO
+    // TODO: TEST ME!!!
+    N_nt(scanner, token, lineCount);
+
+    if (token->tokenId == MINUS_tk) { // [Predict] <N> - <expr>
+        checkAndConsumeTerminal(scanner, token, lineCount, MINUS_tk);
+        expr_nt(scanner, token, lineCount);
+    }
+
+    return; // explicit return
 }
 
 /*  <N> -> <A> / <N> | <A> * <N> | <A>  */
 /*  first( <N> ) : { first(A) }  */
 // process <A> - then check for '/', '*', or nothing to choose production
 void N_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
-    // TODO
+    // TODO: TEST ME!!!
+    A_nt(scanner, token, lineCount);
+
+    if (token->tokenId == DIVIDE_tk) { // [Predict] <A> / <N>
+        checkAndConsumeTerminal(scanner, token, lineCount, DIVIDE_tk);
+        N_nt(scanner, token, lineCount);
+    } else if (token->tokenId == MULT_tk) { // [Predict] <A> * <N>
+        checkAndConsumeTerminal(scanner, token, lineCount, MULT_tk);
+        N_nt(scanner, token, lineCount);
+    }
+
+    return; // explicit return
 }
 
 /*  <A> -> <M> + <A> | <M>  */
 /*  first( <A> ) : { '* <M>': *, '<R>': [ '(', Identifier, Integer/Number ] }  */
 // process <M> if PLUS_tk process <M> + <A> else just process <M> and return
 void A_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
-    // TODO
+    // TODO: TEST ME!!!
+    M_nt(scanner, token, lineCount);
+
+    if (token->tokenId == PLUS_tk) { // [Predict] <M> + <A>
+        checkAndConsumeTerminal(scanner, token, lineCount, PLUS_tk);
+        A_nt(scanner, token, lineCount);
+    }
+
+    return; // explicit return
 }
 
 /*  <M> -> * <M> | <R>  */
 /*  first( <M> ) : { '* <M>': *, '<R>': [ '(', Identifier, Integer/Number ] }  */
 void M_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
-    // TODO
+    // TODO: TEST ME!!!
+    if (token->tokenId == MULT_tk) { // [Predict] * <M>
+        checkAndConsumeTerminal(scanner, token, lineCount, PLUS_tk);
+        A_nt(scanner, token, lineCount);
+    } else if ( isInFirstOfR(token->tokenId) ) {
+        R_nt(scanner, token, lineCount);
+    } else {
+        printErrorAndExit("* / Left Parenthesis / Identifier / Integer", token->tokenId, token->lineNum);
+    }
+
+    return; // explicit return
 }
 
 /*  <R> -> ( <expr> ) | Identifier | Integer  */
 /*  first( <R> ) : { '( <expr> )': '(', 'Identifier': Identifier, 'Integer': Integer/Number }  */
 void R_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
-    // TODO
+    // TODO: TEST ME!!!
+    if (token->tokenId == LPAREN_tk) {
+        checkAndConsumeTerminal(scanner, token, lineCount, LPAREN_tk);
+        expr_nt(scanner, token, lineCount);
+        checkAndConsumeTerminal(scanner, token, lineCount, RPAREN_tk);
+    } else if (token->tokenId == ID_tk) {
+        checkAndConsumeTerminal(scanner, token, lineCount, ID_tk);
+    } else if (token->tokenId == NUM_tk) {
+        checkAndConsumeTerminal(scanner, token, lineCount, NUM_tk);
+    } else {
+        printErrorAndExit("Left Parenthesis / Identifier / Integer", token->tokenId, token->lineNum);
+    }
+
+    return; // explicit return
 }
 
 /*  <stats> -> <stat> <mStat>  */
@@ -162,37 +212,64 @@ void stat_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
 /*  first( <in> ) : { getter }  */
 void in_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
     checkAndConsumeTerminal(scanner, token, lineCount, GETTER_tk);
-
     checkAndConsumeTerminal(scanner, token, lineCount, ID_tk);
-
     return; // explicit return
 }
 
 /*  <out> -> outter <expr>  */
 /*  first( <out> ) : { outter }  */
 void out_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
-    // TODO
+    // TODO: TEST ME!!!
+    checkAndConsumeTerminal(scanner, token, lineCount, OUTTER_tk);
+    expr_nt(scanner, token, lineCount);
     return; // explicit return
 }
 
 /*  <if> -> if [ <expr> <RO> <expr> ] then <stat> */
 /*  first( <if> ) : { if }  */
 void if_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
-    // TODO
+    // TODO: TEST ME!!!
+    checkAndConsumeTerminal(scanner, token, lineCount, IF_tk);
+    checkAndConsumeTerminal(scanner, token, lineCount, LBRACKET_tk);
+
+    expr_nt(scanner, token, lineCount);
+    RO_nt(scanner, token, lineCount);
+    expr_nt(scanner, token, lineCount);
+
+    checkAndConsumeTerminal(scanner, token, lineCount, RBRACKET_tk);
+    checkAndConsumeTerminal(scanner, token, lineCount, THEN_tk);
+
+    stat_nt(scanner, token, lineCount);
+
     return; // explicit return
 }
 
 /*  <loop> -> loop [ <expr> <RO> <expr> ] then <stat>  */
 /*  first( <loop> ) : { loop }  */
 void loop_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
-    // TODO
+    // TODO: TEST ME!!!
+    checkAndConsumeTerminal(scanner, token, lineCount, LOOP_tk);
+    checkAndConsumeTerminal(scanner, token, lineCount, LBRACKET_tk);
+
+    expr_nt(scanner, token, lineCount);
+    RO_nt(scanner, token, lineCount);
+    expr_nt(scanner, token, lineCount);
+
+    checkAndConsumeTerminal(scanner, token, lineCount, RBRACKET_tk);
+    checkAndConsumeTerminal(scanner, token, lineCount, THEN_tk);
+
+    stat_nt(scanner, token, lineCount);
+
     return; // explicit return
 }
 
 /*  <assign> -> assign Identifier := <expr>  */
 /*  first( <assign> ) : { assign }  */
 void assign_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
-    // TODO
+    checkAndConsumeTerminal(scanner, token, lineCount, ASSIGN_tk);
+    checkAndConsumeTerminal(scanner, token, lineCount, ID_tk);
+    checkAndConsumeTerminal(scanner, token, lineCount, COLONEQ_tk);
+    expr_nt(scanner, token, lineCount); // TODO
     return; // explicit return
 }
 
@@ -200,6 +277,9 @@ void assign_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
 /*  first( <R0> ) : { =, %, [ }  */
 void RO_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
     // TODO: process the first '=' for all two char tokens
+    checkAndConsumeTerminal(scanner, token, lineCount, VOID_tk);
+
+
     return; // explicit return
 }
 
@@ -225,6 +305,22 @@ void checkAndConsumeTerminal(Scanner *scanner, TokenRecord *&token, int &lineCou
     } else {
         printErrorAndExit(tokenNames[targetId], token->tokenId, token->lineNum);
     }
+}
+
+int isInFirstOfR(tokenID id) {
+    const tokenID rFirsts[] = {
+            LPAREN_tk,
+            ID_tk,
+            NUM_tk
+    };
+    int len = sizeof(rFirsts) / sizeof(rFirsts[0]);
+    int i;
+
+    for(i = 0; i < len; i++) {
+        if (rFirsts[i] == id) return 1;
+    }
+
+    return 0;
 }
 
 int isInFirstOfStat(tokenID id) {
