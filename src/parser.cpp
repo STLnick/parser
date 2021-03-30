@@ -206,14 +206,16 @@ void RO_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
 /*  <label> -> void Identifier  */
 /*  first( <label> ) : { void }  */
 void label_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
-    // TODO
+    checkAndConsumeTerminal(scanner, token, lineCount, VOID_tk);
+    checkAndConsumeTerminal(scanner, token, lineCount, ID_tk);
     return; // explicit return
 }
 
 /*  <goto> -> proc Identifier  */
 /*  first( <goto> ) : { proc }  */
 void goto_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
-    // TODO
+    checkAndConsumeTerminal(scanner, token, lineCount, PROC_tk);
+    checkAndConsumeTerminal(scanner, token, lineCount, ID_tk);
     return; // explicit return
 }
 
