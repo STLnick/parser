@@ -122,10 +122,9 @@ void A_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
 /*  <M> -> * <M> | <R>  */
 /*  first( <M> ) : { '* <M>': *, '<R>': [ '(', Identifier, Integer/Number ] }  */
 void M_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
-    // TODO: TEST ME!!!
     if (token->tokenId == MULT_tk) { // [Predict] * <M>
-        checkAndConsumeTerminal(scanner, token, lineCount, PLUS_tk);
-        A_nt(scanner, token, lineCount);
+        checkAndConsumeTerminal(scanner, token, lineCount, MULT_tk);
+        M_nt(scanner, token, lineCount);
     } else if ( isInFirstOfR(token->tokenId) ) {
         R_nt(scanner, token, lineCount);
     } else {
