@@ -7,6 +7,7 @@
 #include <istream>
 #include <iostream>
 #include "init.hpp"
+#include "node.hpp"
 #include "parseCommandLineOpts.hpp"
 #include "parser.hpp"
 #include "scanner.hpp"
@@ -41,6 +42,7 @@ int main(int argc, char **argv) {
     // Test Parser
     /* ------------------------------------ */
 
+    // TODO: parser() should return the tree and then another function will print
     parser(scanner);
 
     std::cout << "\n\nFile parsed successfully! Booyah!\n\n";

@@ -2,8 +2,9 @@
 // Created by Nick Ray on 3/27/21.
 //
 #include <iostream>
-#include "scanner.hpp"
+#include "node.hpp"
 #include "parser.hpp"
+#include "scanner.hpp"
 #include "TokenRecord.hpp"
 
 void parser(Scanner *scanner) {
