@@ -275,9 +275,21 @@ void assign_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
 /*  <RO> -> => | =< | == | [ == ] (three tokens) | %  */
 /*  first( <R0> ) : { =, %, [ }  */
 void RO_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
-    // TODO: process the first '=' for all two char tokens
-    checkAndConsumeTerminal(scanner, token, lineCount, VOID_tk);
-
+    if (token->tokenId == GTEQ_tk) {
+        checkAndConsumeTerminal(scanner, token, lineCount, GTEQ_tk);
+    } else if (token->tokenId == LTEQ_tk) {
+        checkAndConsumeTerminal(scanner, token, lineCount, LTEQ_tk);
+    } else if (token->tokenId == EQ_tk) {
+        checkAndConsumeTerminal(scanner, token, lineCount, EQ_tk);
+    } else if (token->tokenId == LBRACKET_tk) {
+        checkAndConsumeTerminal(scanner, token, lineCount, LBRACKET_tk);
+        checkAndConsumeTerminal(scanner, token, lineCount, EQ_tk);
+        checkAndConsumeTerminal(scanner, token, lineCount, RBRACKET_tk);
+    } else if (token->tokenId == MOD_tk) {
+        checkAndConsumeTerminal(scanner, token, lineCount, MOD_tk);
+    } else {
+        printErrorAndExit("=> / =< / == / [ == ] / %", token->tokenId, token->lineNum);
+    }
 
     return; // explicit return
 }
