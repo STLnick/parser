@@ -7,7 +7,7 @@
 
 #include "node.hpp"
 
-node* buildTree(std::string filename);
-void processPreorder(node* node, std::string fileName);
+node* initNode(std::string str, node* node);
+void printPreorder(node* treeNode, int level);
 
 #endif //PARSER_TREE_HPP
