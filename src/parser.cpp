@@ -242,7 +242,7 @@ node* stat_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
 /*  first( <in> ) : { getter }  */
 node* in_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
     node* treeNode = NULL;
-    treeNode = initNode("A_nt", treeNode);
+    treeNode = initNode("in_nt", treeNode);
 
     checkAndConsumeTerminal(scanner, token, lineCount, GETTER_tk, treeNode);
     checkAndConsumeTerminal(scanner, token, lineCount, ID_tk, treeNode);
@@ -253,7 +253,7 @@ node* in_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
 /*  first( <out> ) : { outter }  */
 node* out_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
     node* treeNode = NULL;
-    treeNode = initNode("A_nt", treeNode);
+    treeNode = initNode("out_nt", treeNode);
 
     checkAndConsumeTerminal(scanner, token, lineCount, OUTTER_tk, treeNode);
     treeNode->ntOne = expr_nt(scanner, token, lineCount);
@@ -264,7 +264,7 @@ node* out_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
 /*  first( <if> ) : { if }  */
 node* if_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
     node* treeNode = NULL;
-    treeNode = initNode("A_nt", treeNode);
+    treeNode = initNode("if_nt", treeNode);
 
     checkAndConsumeTerminal(scanner, token, lineCount, IF_tk, treeNode);
     checkAndConsumeTerminal(scanner, token, lineCount, LBRACKET_tk, treeNode);
@@ -285,7 +285,7 @@ node* if_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
 /*  first( <loop> ) : { loop }  */
 node* loop_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
     node* treeNode = NULL;
-    treeNode = initNode("A_nt", treeNode);
+    treeNode = initNode("loop_nt", treeNode);
 
     checkAndConsumeTerminal(scanner, token, lineCount, LOOP_tk, treeNode);
     checkAndConsumeTerminal(scanner, token, lineCount, LBRACKET_tk, treeNode);
@@ -305,7 +305,7 @@ node* loop_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
 /*  first( <assign> ) : { assign }  */
 node* assign_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
     node* treeNode = NULL;
-    treeNode = initNode("A_nt", treeNode);
+    treeNode = initNode("assign_nt", treeNode);
 
     checkAndConsumeTerminal(scanner, token, lineCount, ASSIGN_tk, treeNode);
     checkAndConsumeTerminal(scanner, token, lineCount, ID_tk, treeNode);
@@ -318,7 +318,7 @@ node* assign_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
 /*  first( <R0> ) : { =, %, [ }  */
 node* RO_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
     node* treeNode = NULL;
-    treeNode = initNode("A_nt", treeNode);
+    treeNode = initNode("R0_nt", treeNode);
 
     if (token->tokenId == GTEQ_tk) {
         checkAndConsumeTerminal(scanner, token, lineCount, GTEQ_tk, treeNode);
@@ -343,7 +343,7 @@ node* RO_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
 /*  first( <label> ) : { void }  */
 node* label_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
     node* treeNode = NULL;
-    treeNode = initNode("A_nt", treeNode);
+    treeNode = initNode("label_nt", treeNode);
 
     checkAndConsumeTerminal(scanner, token, lineCount, VOID_tk, treeNode);
     checkAndConsumeTerminal(scanner, token, lineCount, ID_tk, treeNode);
@@ -355,7 +355,7 @@ node* label_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
 /*  first( <goto> ) : { proc }  */
 node* goto_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
     node* treeNode = NULL;
-    treeNode = initNode("A_nt", treeNode);
+    treeNode = initNode("goto_nt", treeNode);
 
     checkAndConsumeTerminal(scanner, token, lineCount, PROC_tk, treeNode);
     checkAndConsumeTerminal(scanner, token, lineCount, ID_tk, treeNode);
