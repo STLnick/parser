@@ -5,46 +5,55 @@
 #include "node.hpp"
 #include "parser.hpp"
 #include "scanner.hpp"
+#include "tree.hpp"
 #include "TokenRecord.hpp"
 
-void parser(Scanner *scanner) {
+node* parser(Scanner *scanner) {
     int lineCount = 1;
+    node *root = NULL;
+    root = initNode("parser", root);
 
     TokenRecord *token = getNextToken(scanner, lineCount);
 
-    program_nt(scanner, token, lineCount); // Grandpappy non-terminal processing
+    root->ntOne = program_nt(scanner, token, lineCount); // Grandpappy non-terminal processing
 
     if (token->tokenId != EOF_tk) {
         printErrorAndExit("End of File", token->tokenId, token->lineNum);
     }
 
-    return;
+    return root;
 }
 
 /*  <program> -> <vars> main <block>  */
 /*  first( <program> ) : { data, main }  */
-void program_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
-    vars_nt(scanner, token, lineCount);
+node* program_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
+    node* treeNode = NULL;
+    treeNode = initNode("program_nt", treeNode);
 
-    checkAndConsumeTerminal(scanner, token, lineCount, MAIN_tk);
+    treeNode->ntOne = vars_nt(scanner, token, lineCount);
 
     block_nt(scanner, token, lineCount);
 
-    return; // explicit return
+    treeNode->ntTwo = block_nt(scanner, token, lineCount);
+
+    return treeNode; // explicit return
 }
 
 /*  <block> -> begin <vars> <stats> end  */
 /*  first( <block> ) : { begin }  */
-void block_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
+node* block_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
+    node* treeNode = NULL;
+    treeNode = initNode("block_nt", treeNode);
+
     if (token->tokenId == BEGIN_tk) { // [Predict] begin <vars> <stats> end
         token = getNextToken(scanner, lineCount); // consume BEGIN_tk
 
-        vars_nt(scanner, token, lineCount);
-        stats_nt(scanner, token, lineCount);
+        treeNode->ntOne = vars_nt(scanner, token, lineCount);
+        treeNode->ntTwo = stats_nt(scanner, token, lineCount);
 
         checkAndConsumeTerminal(scanner, token, lineCount, END_tk);
 
-        return; // explicit return
+        return treeNode; // explicit return
     } else {
         printErrorAndExit("begin", token->tokenId, token->lineNum);
     }
@@ -52,7 +61,10 @@ void block_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
 
 /*  <vars> -> ε | data Identifier := Integer ; <vars>  */
 /*  first( <vars> ) : { data }  */
-void vars_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
+node* vars_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
+    node* treeNode = NULL;
+    treeNode = initNode("vars_nt", treeNode);
+
     if (token->tokenId == DATA_tk) { // [Predict] data Identifier := Integer ; <vars>
         token = getNextToken(scanner, lineCount); // consume DATA_tk token
 
@@ -64,78 +76,93 @@ void vars_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
 
         checkAndConsumeTerminal(scanner, token, lineCount, SEMI_tk);
 
-        vars_nt(scanner, token, lineCount); // vars_nt()
+        treeNode->ntOne = vars_nt(scanner, token, lineCount); // vars_nt()
 
-        return; // explicit return
+        return treeNode; // explicit return
     } else { // [Predict] ε
-        return;
+        return NULL;
     }
 }
 
 /*  <expr> -> <N> - <expr> | <N>  */
 /*  first( <expr> ) : { first(N) }  */
 // process <N> - then check for '-' to choose production
-void expr_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
-    N_nt(scanner, token, lineCount);
+node* expr_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
+    node* treeNode = NULL;
+    treeNode = initNode("expr_nt", treeNode);
+
+    treeNode->ntOne = N_nt(scanner, token, lineCount);
 
     if (token->tokenId == MINUS_tk) { // [Predict] <N> - <expr>
         checkAndConsumeTerminal(scanner, token, lineCount, MINUS_tk);
-        expr_nt(scanner, token, lineCount);
+        treeNode->ntTwo = expr_nt(scanner, token, lineCount);
     }
 
-    return; // explicit return
+    return treeNode; // explicit return
 }
 
 /*  <N> -> <A> / <N> | <A> * <N> | <A>  */
 /*  first( <N> ) : { first(A) }  */
-void N_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
-    A_nt(scanner, token, lineCount);
+node* N_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
+    node* treeNode = NULL;
+    treeNode = initNode("N_nt", treeNode);
+
+    treeNode->ntOne = A_nt(scanner, token, lineCount);
 
     if (token->tokenId == DIVIDE_tk) { // [Predict] <A> / <N>
         checkAndConsumeTerminal(scanner, token, lineCount, DIVIDE_tk);
-        N_nt(scanner, token, lineCount);
+        treeNode->ntTwo = N_nt(scanner, token, lineCount);
     } else if (token->tokenId == MULT_tk) { // [Predict] <A> * <N>
         checkAndConsumeTerminal(scanner, token, lineCount, MULT_tk);
-        N_nt(scanner, token, lineCount);
+        treeNode->ntTwo = N_nt(scanner, token, lineCount);
     }
 
-    return; // explicit return
+    return treeNode; // explicit return
 }
 
 /*  <A> -> <M> + <A> | <M>  */
 /*  first( <A> ) : { '* <M>': *, '<R>': [ '(', Identifier, Integer/Number ] }  */
-void A_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
-    M_nt(scanner, token, lineCount);
+node* A_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
+    node* treeNode = NULL;
+    treeNode = initNode("A_nt", treeNode);
+
+    treeNode->ntOne = M_nt(scanner, token, lineCount);
 
     if (token->tokenId == PLUS_tk) { // [Predict] <M> + <A>
         checkAndConsumeTerminal(scanner, token, lineCount, PLUS_tk);
-        A_nt(scanner, token, lineCount);
+        treeNode->ntTwo = A_nt(scanner, token, lineCount);
     }
 
-    return; // explicit return
+    return treeNode; // explicit return
 }
 
 /*  <M> -> * <M> | <R>  */
 /*  first( <M> ) : { '* <M>': *, '<R>': [ '(', Identifier, Integer/Number ] }  */
-void M_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
+node* M_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
+    node* treeNode = NULL;
+    treeNode = initNode("M_nt", treeNode);
+
     if (token->tokenId == MULT_tk) { // [Predict] * <M>
         checkAndConsumeTerminal(scanner, token, lineCount, MULT_tk);
-        M_nt(scanner, token, lineCount);
+        treeNode->ntOne = M_nt(scanner, token, lineCount);
     } else if ( isInFirstOfR(token->tokenId) ) {
-        R_nt(scanner, token, lineCount);
+        treeNode->ntOne = R_nt(scanner, token, lineCount);
     } else {
         printErrorAndExit("* / Left Parenthesis / Identifier / Integer", token->tokenId, token->lineNum);
     }
 
-    return; // explicit return
+    return treeNode; // explicit return
 }
 
 /*  <R> -> ( <expr> ) | Identifier | Integer  */
 /*  first( <R> ) : { '( <expr> )': '(', 'Identifier': Identifier, 'Integer': Integer/Number }  */
-void R_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
+node* R_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
+    node* treeNode = NULL;
+    treeNode = initNode("R_nt", treeNode);
+
     if (token->tokenId == LPAREN_tk) {
         checkAndConsumeTerminal(scanner, token, lineCount, LPAREN_tk);
-        expr_nt(scanner, token, lineCount);
+        treeNode->ntOne = expr_nt(scanner, token, lineCount);
         checkAndConsumeTerminal(scanner, token, lineCount, RPAREN_tk);
     } else if (token->tokenId == ID_tk) {
         checkAndConsumeTerminal(scanner, token, lineCount, ID_tk);
@@ -145,127 +172,148 @@ void R_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
         printErrorAndExit("Left Parenthesis / Identifier / Integer", token->tokenId, token->lineNum);
     }
 
-    return; // explicit return
+    return treeNode; // explicit return
 }
 
 /*  <stats> -> <stat> <mStat>  */
 /*  first( <stats> ) : { '<stat> <mStat>': [getter, outter, begin, if, loop, assign, proc, void] }  */
-void stats_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
-    stat_nt(scanner, token, lineCount);
-    mStat_nt(scanner, token, lineCount);
-    return; // explicit return
+node* stats_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
+    node* treeNode = NULL;
+    treeNode = initNode("stats_nt", treeNode);
+
+    treeNode->ntOne = stat_nt(scanner, token, lineCount);
+    treeNode->ntTwo =  mStat_nt(scanner, token, lineCount);
+    return treeNode; // explicit return
 }
 
 /*  <mStat> -> ε | <stat> <mStat>  */
 /*  first( <mStat> ) : { '<stat> <mStat>': [getter, outter, begin, if, loop, assign, proc, void] }  */
-void mStat_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
+node* mStat_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
+    node* treeNode = NULL;
+    treeNode = initNode("mStat_nt", treeNode);
+
     if ( isInFirstOfStat(token->tokenId) ) { // [Predict] <stat> <mStat>
-        stat_nt(scanner, token, lineCount);
-        mStat_nt(scanner, token, lineCount);
-        return; // explicit return
+        treeNode->ntOne = stat_nt(scanner, token, lineCount);
+        treeNode->ntTwo = mStat_nt(scanner, token, lineCount);
+        return treeNode; // explicit return
     } else { // [Predict] ε
-        return; // explicit return
+        return NULL; // explicit return
     }
 }
 
 /*  <stat> -> <in> ; | <out> ; | <block> | <if> ; | <loop> ; | <assign> ; | <goto> ; | <label> ; |  */
 /*  first( <stat> ) : { '<in>': getter, '<out>': outter, '<block>': begin, '<if>': if,
  *                      '<loop>': loop, '<assign>': assign, '<goto>': proc, '<label>': void }  */
-void stat_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
+node* stat_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
+    node* treeNode = NULL;
+    treeNode = initNode("stat_nt", treeNode);
+
     if (token->tokenId == GETTER_tk) {
-        in_nt(scanner, token, lineCount);
+        treeNode->ntOne = in_nt(scanner, token, lineCount);
         checkAndConsumeTerminal(scanner, token, lineCount, SEMI_tk);
     } else if (token->tokenId == OUTTER_tk) {
-        out_nt(scanner, token, lineCount);
+        treeNode->ntOne = out_nt(scanner, token, lineCount);
         checkAndConsumeTerminal(scanner, token, lineCount, SEMI_tk);
     } else if (token->tokenId == BEGIN_tk) {
-        block_nt(scanner, token, lineCount);
+        treeNode->ntOne = block_nt(scanner, token, lineCount);
     } else if (token->tokenId == IF_tk) {
-        if_nt(scanner, token, lineCount);
+        treeNode->ntOne = if_nt(scanner, token, lineCount);
         checkAndConsumeTerminal(scanner, token, lineCount, SEMI_tk);
     } else if (token->tokenId == LOOP_tk) {
-        loop_nt(scanner, token, lineCount);
+        treeNode->ntOne = loop_nt(scanner, token, lineCount);
         checkAndConsumeTerminal(scanner, token, lineCount, SEMI_tk);
     } else if (token->tokenId == ASSIGN_tk) {
-        assign_nt(scanner, token, lineCount);
+        treeNode->ntOne = assign_nt(scanner, token, lineCount);
         checkAndConsumeTerminal(scanner, token, lineCount, SEMI_tk);
     } else if (token->tokenId == PROC_tk) {
-        goto_nt(scanner, token, lineCount);
+        treeNode->ntOne = goto_nt(scanner, token, lineCount);
         checkAndConsumeTerminal(scanner, token, lineCount, SEMI_tk);
     } else if (token->tokenId == VOID_tk) {
-        label_nt(scanner, token, lineCount);
+        treeNode->ntOne = label_nt(scanner, token, lineCount);
         checkAndConsumeTerminal(scanner, token, lineCount, SEMI_tk);
     } else {
         printErrorAndExit("getter/outter/begin/if/loop/assign/proc/void", token->tokenId, token->lineNum);
     }
 
-    return; // explicit return
+    return treeNode; // explicit return
 }
 
 /*  <in> -> getter Identifier  */
 /*  first( <in> ) : { getter }  */
-void in_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
-    checkAndConsumeTerminal(scanner, token, lineCount, GETTER_tk);
-    checkAndConsumeTerminal(scanner, token, lineCount, ID_tk);
-    return; // explicit return
+node* in_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
+    node* treeNode = NULL;
+    treeNode = initNode("A_nt", treeNode);
+
+    return treeNode; // explicit return
 }
 
 /*  <out> -> outter <expr>  */
 /*  first( <out> ) : { outter }  */
-void out_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
-    checkAndConsumeTerminal(scanner, token, lineCount, OUTTER_tk);
-    expr_nt(scanner, token, lineCount);
-    return; // explicit return
+node* out_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
+    node* treeNode = NULL;
+    treeNode = initNode("A_nt", treeNode);
+
+    treeNode->ntOne = expr_nt(scanner, token, lineCount);
+    return treeNode; // explicit return
 }
 
 /*  <if> -> if [ <expr> <RO> <expr> ] then <stat> */
 /*  first( <if> ) : { if }  */
-void if_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
-    checkAndConsumeTerminal(scanner, token, lineCount, IF_tk);
-    checkAndConsumeTerminal(scanner, token, lineCount, LBRACKET_tk);
+node* if_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
+    node* treeNode = NULL;
+    treeNode = initNode("A_nt", treeNode);
 
-    expr_nt(scanner, token, lineCount);
-    RO_nt(scanner, token, lineCount);
-    expr_nt(scanner, token, lineCount);
+
+    treeNode->ntOne = expr_nt(scanner, token, lineCount);
+    treeNode->ntTwo = RO_nt(scanner, token, lineCount);
+    treeNode->ntThree = expr_nt(scanner, token, lineCount);
 
     checkAndConsumeTerminal(scanner, token, lineCount, RBRACKET_tk);
     checkAndConsumeTerminal(scanner, token, lineCount, THEN_tk);
 
-    stat_nt(scanner, token, lineCount);
+    treeNode->ntFour = stat_nt(scanner, token, lineCount);
 
-    return; // explicit return
+    return treeNode; // explicit return
 }
 
 /*  <loop> -> loop [ <expr> <RO> <expr> ] then <stat>  */
 /*  first( <loop> ) : { loop }  */
-void loop_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
-    checkAndConsumeTerminal(scanner, token, lineCount, LOOP_tk);
-    checkAndConsumeTerminal(scanner, token, lineCount, LBRACKET_tk);
+node* loop_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
+    node* treeNode = NULL;
+    treeNode = initNode("A_nt", treeNode);
 
     expr_nt(scanner, token, lineCount);
     RO_nt(scanner, token, lineCount);
-    expr_nt(scanner, token, lineCount);
+
+    treeNode->ntOne = expr_nt(scanner, token, lineCount);
+    treeNode->ntTwo = RO_nt(scanner, token, lineCount);
+    treeNode->ntThree = expr_nt(scanner, token, lineCount);
 
     checkAndConsumeTerminal(scanner, token, lineCount, RBRACKET_tk);
 
-    stat_nt(scanner, token, lineCount);
+    treeNode->ntFour = stat_nt(scanner, token, lineCount);
 
-    return; // explicit return
+    return treeNode; // explicit return
 }
 
 /*  <assign> -> assign Identifier := <expr>  */
 /*  first( <assign> ) : { assign }  */
-void assign_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
-    checkAndConsumeTerminal(scanner, token, lineCount, ASSIGN_tk);
-    checkAndConsumeTerminal(scanner, token, lineCount, ID_tk);
+node* assign_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
+    node* treeNode = NULL;
+    treeNode = initNode("A_nt", treeNode);
     checkAndConsumeTerminal(scanner, token, lineCount, COLONEQ_tk);
     expr_nt(scanner, token, lineCount);
     return; // explicit return
+    treeNode->ntOne = expr_nt(scanner, token, lineCount);
+    return treeNode; // explicit return
 }
 
 /*  <RO> -> => | =< | == | [ == ] (three tokens) | %  */
 /*  first( <R0> ) : { =, %, [ }  */
-void RO_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
+node* RO_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
+    node* treeNode = NULL;
+    treeNode = initNode("A_nt", treeNode);
+
     if (token->tokenId == GTEQ_tk) {
         checkAndConsumeTerminal(scanner, token, lineCount, GTEQ_tk);
     } else if (token->tokenId == LTEQ_tk) {
@@ -282,23 +330,25 @@ void RO_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
         printErrorAndExit("=> / =< / == / [ == ] / %", token->tokenId, token->lineNum);
     }
 
-    return; // explicit return
+    return treeNode; // explicit return
 }
 
 /*  <label> -> void Identifier  */
 /*  first( <label> ) : { void }  */
-void label_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
-    checkAndConsumeTerminal(scanner, token, lineCount, VOID_tk);
-    checkAndConsumeTerminal(scanner, token, lineCount, ID_tk);
-    return; // explicit return
+node* label_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
+    node* treeNode = NULL;
+    treeNode = initNode("A_nt", treeNode);
+
+    return treeNode; // explicit return
 }
 
 /*  <goto> -> proc Identifier  */
 /*  first( <goto> ) : { proc }  */
-void goto_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
-    checkAndConsumeTerminal(scanner, token, lineCount, PROC_tk);
-    checkAndConsumeTerminal(scanner, token, lineCount, ID_tk);
-    return; // explicit return
+node* goto_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
+    node* treeNode = NULL;
+    treeNode = initNode("A_nt", treeNode);
+
+    return treeNode; // explicit return
 }
 
 void checkAndConsumeTerminal(Scanner *scanner, TokenRecord *&token, int &lineCount, tokenID targetId) {

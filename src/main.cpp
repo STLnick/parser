@@ -43,7 +43,8 @@ int main(int argc, char **argv) {
     /* ------------------------------------ */
 
     // TODO: parser() should return the tree and then another function will print
-    parser(scanner);
+    node *root = NULL;
+    root = parser(scanner);
 
     std::cout << "\n\nFile parsed successfully! Booyah!\n\n";
 
