@@ -366,9 +366,8 @@ node* goto_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
 }
 
 void checkAndConsumeTerminal(Scanner *scanner, TokenRecord *&token, int &lineCount, tokenID targetId, node* treeNode) {
-    std::cout << "NICK" << std::endl;
     if (token->tokenId == targetId) {
-        treeNode->tokens[treeNode->tokens.size()] = token->stringVal;
+        treeNode->tokens.push_back(token->stringVal);
         token = getNextToken(scanner, lineCount);
     } else {
         printErrorAndExit(tokenNames[targetId], token->tokenId, token->lineNum);
