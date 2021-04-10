@@ -46,6 +46,7 @@ node* block_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
     treeNode = initNode("block_nt", treeNode);
 
     if (token->tokenId == BEGIN_tk) { // [Predict] begin <vars> <stats> end
+        treeNode->tokens.push_back(token->stringVal);
         token = getNextToken(scanner, lineCount); // consume BEGIN_tk
 
         treeNode->ntOne = vars_nt(scanner, token, lineCount);
@@ -66,6 +67,7 @@ node* vars_nt(Scanner *scanner, TokenRecord *&token, int &lineCount) {
     treeNode = initNode("vars_nt", treeNode);
 
     if (token->tokenId == DATA_tk) { // [Predict] data Identifier := Integer ; <vars>
+        treeNode->tokens.push_back(token->stringVal);
         token = getNextToken(scanner, lineCount); // consume DATA_tk token
 
         checkAndConsumeTerminal(scanner, token, lineCount, ID_tk, treeNode);
