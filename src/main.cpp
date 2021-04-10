@@ -13,6 +13,7 @@
 #include "scanner.hpp"
 #include "TokenRecord.hpp"
 #include "token.hpp"
+#include "tree.hpp"
 #include "utils.hpp"
 
 int main(int argc, char **argv) {
@@ -45,6 +46,7 @@ int main(int argc, char **argv) {
     // TODO: parser() should return the tree and then another function will print
     node *root = NULL;
     root = parser(scanner);
+    printPreorder(root);
 
     std::cout << "\n\nFile parsed successfully! Booyah!\n\n";
 
