@@ -19,10 +19,10 @@ void printPreorder(node* treeNode, int level = 0) {
 
     // Print tokens by node label
     std::cout << std::string(level * 2, ' ') + treeNode->label + ": ";
-    while (!treeNode->tokens.empty()) {
-        std::cout << treeNode->tokens.front() << ", ";
-        treeNode->tokens.erase(&treeNode->tokens.front());
+    for(int i = 0; i < treeNode->tokens.size(); i++) {
+        std::cout << treeNode->tokens[i] << " ";
     }
+    std::cout << std::endl;
 
     if (treeNode->ntOne != NULL) {
         printPreorder(treeNode->ntOne, level + 1);
