@@ -1,7 +1,7 @@
 #include <ctype.h>
+#include <cstdlib>
 #include <iostream>
 #include <istream>
-#include <stdlib.h>
 #include <string>
 #include "ScannerStruct.hpp"
 #include "Table.hpp"
@@ -48,6 +48,8 @@ TokenRecord *getKeywordToken(std::string str, int lineCnt) {
     if (str == "assign") return initToken(str, ASSIGN_tk, lineCnt);
     if (str == "data")   return initToken(str, DATA_tk, lineCnt);
     if (str == "proc")   return initToken(str, PROC_tk, lineCnt);
+
+    exit(1); // Error
 }
 
 TokenRecord *getTypedToken(State state, std::string str, int lineCnt) {
@@ -101,6 +103,15 @@ TokenRecord *getTypedToken(State state, std::string str, int lineCnt) {
             return initToken(str, LBRACKET_tk, lineCnt);
         case RBRACKET:
             return initToken(str, RBRACKET_tk, lineCnt);
+        case INITIAL:
+        case CMT_ST_A:
+        case CMT_ST_B:
+        case CMT_END_A:
+        case CMT_END_B:
+        case FINAL:
+        case ERROR:
+        default: 
+            exit(1);
     }
 }
 
@@ -144,4 +155,6 @@ TokenRecord *getNextToken(Scanner *scanner, int &lineCnt) {
             advanceScanner(scanner);
         }
     }
+
+    exit(1); // Error
 }
