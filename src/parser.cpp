@@ -1,6 +1,7 @@
 //
 // Created by Nick Ray on 3/27/21.
 //
+#include <cstdlib>
 #include <iostream>
 #include "node.hpp"
 #include "parser.hpp"

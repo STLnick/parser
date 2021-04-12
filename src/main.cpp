@@ -3,6 +3,7 @@
  * 2/15/21
  * scanner
  */
+#include <cstdlib>
 #include <fstream>
 #include <istream>
 #include <iostream>
@@ -32,7 +33,10 @@ int main(int argc, char **argv) {
     init(argc, argv, fileNameToRead);
 
     // Setup a file stream to assign src in scanner
-    std::ifstream srcFile(fileNameToRead + ".fs");
+    fileNameToRead += ".fs";
+
+    std::ifstream srcFile(fileNameToRead.c_str());
+
     std::string srcString;
     readSrcIntoString(srcFile, srcString);
 
@@ -43,7 +47,6 @@ int main(int argc, char **argv) {
     // Test Parser
     /* ------------------------------------ */
 
-    // TODO: parser() should return the tree and then another function will print
     node *root = NULL;
     root = parser(scanner);
     printPreorder(root);
