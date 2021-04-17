@@ -8,10 +8,10 @@
 #include "ScannerStruct.hpp"
 #include "TokenRecord.hpp"
 
-void advanceScanner(Scanner *scanner);
+void advanceScanner(Scanner *scanner, int &charCol);
 
 Scanner *initScanner(std::string &src);
 
-TokenRecord *getNextToken(Scanner *scanner, int &lineCnt);
+TokenRecord *getNextToken(Scanner *scanner, int &lineCnt, int &charCol);
 
 #endif //SCANNER_SCANNER_HPP

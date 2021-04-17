@@ -153,6 +153,7 @@ const std::string keywords[] = {
 typedef struct {
     tokenID tokenId;       // The token type
     std::string stringVal; // The identifying string value for the token
+    int charCol;           // Column on line token begins
     int lineNum;           // Line number which the token is on in source
 } TokenRecord;
 
